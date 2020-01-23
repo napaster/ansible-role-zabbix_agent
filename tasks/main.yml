@@ -1,0 +1,27 @@
+---
+- import_tasks: "pre_requisite.yml"
+- include_tasks: "packages.yml"
+  when:
+  - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_install_package']) is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_install_package']) == 'true'"
+  vars:
+    zabbix_agent_install_package: "
+      [] | map(&install_package || 'false', @) | [0]"
+- include_tasks: "deploy_zabbix_psk.yml"
+  when:
+  - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_deploy_psk']) is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_deploy_psk']) == 'true'"
+  vars:
+    zabbix_agent_deploy_psk: "[] | map(&install_package || 'false', @) | [0]"
+- include_tasks: "deploy_zabbix_agent.yml"
+  when:
+  - "vars['zabbix_agent_settings'] is defined"
+  - "vars['zabbix_agent_settings'] != []"

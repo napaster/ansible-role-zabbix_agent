@@ -1,0 +1,15 @@
+---
+- name: Restart zabbix-agent
+  systemd:
+    name: "{{ hostvars[inventory_hostname]['zabbix_agent_service'] }}"
+    daemon_reload: "yes"
+    state: "restarted"
+  when:
+  - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_restart']) is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_restart']) == 'true'"
+  vars:
+    zabbix_agent_restart: "[] | map(&restart || 'false', @) | [0]"

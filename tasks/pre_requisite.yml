@@ -1,0 +1,23 @@
+---
+- name: zabbix_agent | Add the OS specific variables
+  include_vars: "{{ hostvars[inventory_hostname]['ansible_os_family'] +
+                    '.yml' }}"
+- name: zabbix_agent | Set facts about samba role
+  set_fact:
+    zabbix_agent_settings: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
+      json_query('[].settings[]') }}"
+    zabbix_agent_psk_string: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
+      json_query('[].psk_string[] | [0]') }}"
+- name: zabbix_agent | Assert that system manager is systemd
+  assert:
+    that:
+    - "hostvars[inventory_hostname]['ansible_service_mgr'] == 'systemd'"
+    msg: "System manager is not systemd."
+    quiet: "true"
+- name: zabbix_agent | Create zabbix catalog
+  file:
+    path: "{{ hostvars[inventory_hostname]['zabbix_agent_conf_dest'] }}"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0755"

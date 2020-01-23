@@ -1,0 +1,227 @@
+{{ '## ' + 'zabbix_agentd.conf' }}
+{{ '# ' + ansible_managed }}
+{{ '# ' + 'Do not edit manually' }}
+
+{% if vars['zabbix_agent_settings'] is defined %}
+{% for z in vars['zabbix_agent_settings'] %}
+{% if z.pid_file is defined and z.pid_file != '' %}
+{{ 'PidFile=' + z.pid_file }}
+{% endif %}
+{% if z.log_type is defined and z.log_type in ['system', 'file', 'console'] %}
+{{ 'LogType=' + z.log_type }}
+{% endif %}
+{% if z.log_file_size is defined and (z.log_file_size > '-1' <= '1024') %}
+{{ 'LogFileSize=' ~ z.log_file_size }}
+{% endif %}
+{% if z.debug_level is defined and (z.debug_level > '-1' <= '5') %}
+{{ 'DebugLevel=' ~ z.debug_level }}
+{% endif %}
+{% if z.source_ip is defined and z.source_ip | ipaddr('host') %}
+{{ 'SourceIP=' + z.source_ip }}
+{% endif %}
+{% if z.enable_remote_commands is defined and
+      z.enable_remote_commands in ['0', '1'] %}
+{{ 'EnableRemoteCommands=' ~ z.enable_remote_commands }}
+{% endif %}
+{% if z.log_remote_commands is defined and
+      z.log_remote_commands in ['0', '1'] %}
+{{ 'LogRemoteCommands=' ~ z.log_remote_commands }}
+{% endif %}
+{% if z.server is defined and z.server != '' %}
+{% if z.server is string and z.server %}
+{{ 'Server=' + z.server }}
+{% elif z.server is sequence %}
+{% for zs in z.server %}
+{% if loop.first %}
+{{ 'Server=' -}}
+{% endif %}
+{% if zs %}
+{{ zs -}}
+{% endif %}
+{% if loop.last %}
+{{ '' }}
+{% else %}
+{{ ',' -}}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if z.listen_port is defined and z.listen_port != '' %}
+{{ 'ListenPort=' ~ z.listen_port }}
+{% endif %}
+{% if z.listen_ip is defined and z.listen_ip != '' %}
+{% if z.listen_ip is string and z.listen_ip | ipaddr() %}
+{{ 'ListenIP=' + z.listen_ip }}
+{% elif z.listen_ip is sequence %}
+{% for zl in z.listen_ip %}
+{% if loop.first %}
+{{ 'ListenIP=' -}}
+{% endif %}
+{% if zl | ipaddr() %}
+{{ zl }}
+{% endif %}
+{% if loop.last %}
+{{ '' }}
+{% else %}
+{{ ',' -}}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if z.start_agents is defined and (z.start_agents > '-1' <= '100') %}
+{{ 'StartAgents=' ~ z.start_agents }}
+{% endif %}
+{% if z.server_active is defined and z.server_active != '' %}
+{% if z.server_active is string %}
+{{ 'ServerActive=' + z.server_active }}
+{% elif z.server_active is sequence %}
+{{ 'ServerActive=' + z.server_active | join(',') }}
+{% endif %}
+{% endif %}
+{% if z.hostname is defined and z.hostname != '' %}
+{{ 'Hostname=' + z.hostname }}
+{% endif %}
+{% if z.hostname_item is defined and z.hostname_item != '' %}
+{{ 'HostnameItem=' + z.hostname_item }}
+{% endif %}
+{% if z.host_metadata is defined and (z.host_metadata > '-1' <= '255') %}
+{{ 'HostMetadata=' ~ z.host_metadata }}
+{% endif %}
+{% if z.host_metadata_item is defined and z.host_metadata_item != '' %}
+{{ 'HostMetadataItem=' + z.host_metadata_item }}
+{% endif %}
+{% if z.host_interface is defined and z.host_interface != '' %}
+{{ 'HostInterface=' + z.host_interface }}
+{% endif %}
+{% if z.host_interface_item is defined and z.host_interface_item != '' %}
+{{ 'HostInterfaceItem=' + z.host_interface_item }}
+{% endif %}
+{% if z.refresh_active_checks is defined and
+     (z.refresh_active_checks > '59' <= '3600') %}
+{{ 'RefreshActiveChecks=' ~ z.refresh_active_checks }}
+{% endif %}
+{% if z.buffer_send is defined and (z.buffer_send > '0' <= '3600') %}
+{{ 'BufferSend=' ~ z.refresh_active_checks }}
+{% endif %}
+{% if z.buffer_size is defined and (z.buffer_size > '1' <= '65535') %}
+{{ 'BufferSize=' ~ z.buffer_size }}
+{% endif %}
+{% if z.max_lines_per_second is defined and
+     (z.max_lines_per_second > '0' <= '1000') %}
+{{ 'MaxLinesPerSecond=' ~ z.max_lines_per_second }}
+{% endif %}
+{% if z.alias is defined and z.alias != '' %}
+{% if z.alias is string %}
+{{ 'Alias=' + z.alias }}
+{% elif z.alias is sequence %}
+{% for za in z.alias %}
+{{ 'Alias=' + z.za }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if z.timeout is defined and (z.timeout > '0' <= '30') %}
+{{ 'Timeout=' ~ z.timeout }}
+{% endif %}
+{% if z.allow_root is defined and z.allow_root in ['0', '1'] %}
+{{ 'AllowRoot=' ~ z.allow_root }}
+{% endif %}
+{% if z.user is defined and z.user != '' %}
+{{ 'User=' ~ z.user }}
+{% endif %}
+{% if z.include is defined and z.include != '' %}
+{% if z.include is string %}
+{{ 'Include=' + z.include }}
+{% elif z.include is sequence %}
+{% for zi in z.include %}
+{{ 'Include=' + zi }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if z.unsafe_user_parameters is defined and
+      z.unsafe_user_parameters in ['0', '1'] %}
+{{ 'UnsafeUserParameters=' ~ z.unsafe_user_parameters }}
+{% endif %}
+{% if z.user_parameter is defined and z.user_parameter != '' %}
+{% for zu in z.user_parameter %}
+{{ 'UserParameter=' ~ zu.key ~ ',' ~ zu.command }}
+{% endfor %}
+{% endif %}
+{% if z.load_module_path is defined and z.load_module_path != '' %}
+{{ 'LoadModulePath=' + z.load_module_path }}
+{% endif %}
+{% if z.load_module is defined and z.load_module != '' %}
+{% if z.load_module is string %}
+{{ 'LoadModulePath=' + z.load_module }}
+{% elif z.load_module is sequence %}
+{% for zl in z.load_module %}
+{{ 'LoadModulePath=' + zl }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if z.tls_connect is defined and z.tls_connect != '' %}
+{% if z.tls_connect is string and
+      z.tls_connect in ['unencrypted', 'psk', 'cert'] %}
+{{ 'TLSConnect=' + z.tls_connect }}
+{% elif z.tls_connect is sequence %}
+{% for zt in z.tls_connect %}
+{% if loop.first %}
+{{ 'TLSConnect=' -}}
+{% endif %}
+{% if zt in ['unencrypted', 'psk', 'cert'] %}
+{{ 'zt' }}
+{% endif %}
+{% if loop.last %}
+{{ '' }}
+{% else %}
+{{ ',' -}}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if z.tls_accept is defined and z.tls_accept != '' %}
+{% if z.tls_accept is string and
+      z.tls_accept in ['unencrypted', 'psk', 'cert'] %}
+{{ 'TLSAccept=' + z.tls_accept }}
+{% elif z.tls_accept is sequence %}
+{% for zt in z.tls_accept %}
+{% if loop.first %}
+{{ 'TLSAccept=' -}}
+{% endif %}
+{% if zt in ['unencrypted', 'psk', 'cert'] %}
+{{ 'zt' }}
+{% endif %}
+{% if loop.last %}
+{{ '' }}
+{% else %}
+{{ ',' -}}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if z.tls_ca_file is defined and z.tls_ca_file != '' %}
+{{ 'TLSCAFile=' + z.tls_ca_file }}
+{% endif %}
+{% if z.tls_crl_file is defined and z.tls_crl_file != '' %}
+{{ 'TLSCRLFile=' + z.tls_crl_file }}
+{% endif %}
+{% if z.tls_server_cert_issuer is defined and z.tls_server_cert_issuer != '' %}
+{{ 'TLSServerCertIssuer=' + z.tls_server_cert_issuer }}
+{% endif %}
+{% if z.tls_server_cert_subject is defined and
+      z.tls_server_cert_subject != '' %}
+{{ 'TLSServerCertSubject=' + z.tls_server_cert_subject }}
+{% endif %}
+{% if z.tls_cert_file is defined and z.tls_cert_file != '' %}
+{{ 'TLSCertFile=' + z.tls_cert_file }}
+{% endif %}
+{% if z.tls_key_file is defined and z.tls_key_file != '' %}
+{{ 'TLSKeyFile=' + z.tls_key_file }}
+{% endif %}
+{% if z.tls_psk_identity is defined and z.tls_psk_identity != '' %}
+{{ 'TLSPSKIdentity=' + z.tls_psk_identity }}
+{% endif %}
+{% if z.tls_psk_file is defined and z.tls_psk_file != '' %}
+{{ 'TLSPSKFile=' + z.tls_psk_file }}
+{% endif %}
+{% endfor %}
+{% endif %}
