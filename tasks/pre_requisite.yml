@@ -2,7 +2,7 @@
 - name: zabbix_agent | Add the OS specific variables
   include_vars: "{{ hostvars[inventory_hostname]['ansible_os_family'] +
                     '.yml' }}"
-- name: zabbix_agent | Set facts about samba role
+- name: zabbix_agent | Set facts about zabbix_agent role
   set_fact:
     zabbix_agent_settings: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
       json_query('[].settings[]') }}"
