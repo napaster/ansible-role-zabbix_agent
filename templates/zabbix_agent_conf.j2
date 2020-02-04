@@ -143,7 +143,13 @@
 {% endif %}
 {% if z.user_parameter is defined and z.user_parameter != '' %}
 {% for zu in z.user_parameter %}
+{% if zu.s3 is defined and zu.s3 == 'true' %}
+{{ 'UserParameter=' ~ zu.key ~ ',' ~
+    hostvars[inventory_hostname]['zabbix_agent_s3_scripts_dest'] ~ '/' ~
+    zu.command }}
+{% else %}
 {{ 'UserParameter=' ~ zu.key ~ ',' ~ zu.command }}
+{% endif %}
 {% endfor %}
 {% endif %}
 {% if z.load_module_path is defined and z.load_module_path != '' %}

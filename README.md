@@ -1,4 +1,4 @@
-# ansible-zabbix-agent
+# ansible-zabbix_agent
 
 Zabbix agent is deployed on a monitoring target to actively monitor local
 resources and applications (hard drives, memory, processor statistics etc).
@@ -18,6 +18,34 @@ zabbix_agent:
   restart: 'true'
 # Install zabbix-agent package or not.
   install_package: 'true'
+# Install or not prepared scripts from Amazon S3 storage. This may be useful
+# for uncompatible 'user_parameter' commands with YAML syntax.
+  install_s3_scripts: 'true'
+# Amazon S3 Storage settings.
+  s3_storage_settings:
+# AWS access key id. If not set then the value of the AWS_ACCESS_KEY
+# environment variable is used.
+    - aws_access_key: "{{ aws_s3_access_key }}"
+# AWS secret key. If not set then the value of the AWS_SECRET_KEY environment
+# variable is used.
+      aws_secret_key: "{{ aws_s3_secret_key }}"
+# Bucket name.
+      bucket: "{{ aws_s3_bucket }}"
+# Time limit (in seconds) for the URL generated and returned by S3.
+      expiration: '120'
+# Enable fakeS3.
+      rgw: "{{ aws_s3_rgw }}"
+# S3 URL endpoint for usage with fakeS3. Otherwise assumes AWS.
+      s3_url: "{{ aws_s3_url }}"
+# When set to 'no', SSL certificates will not be validated.
+      validate_certs: "{{ omit }}"
+# S3 region.
+      region: "{{ omit }}"
+# Use this boto profile.
+      profile: "{{ omit }}"
+# Prefix ('folder') where objects placed in bucket, i.e.:
+# s3://ansible/ansible-role-zabbix_agent/*
+      object_prefix: 'ansible-role-zabbix_agent'
 # Pre-shared key string.
   psk_string: '42a46dc13aff1bc26ba2467779da343614a8bbf1c39780c9819cf24e32d8f279'
 # Deploy or not 'psk_string' as '/etc/zabbix/zabbix_agentd.psk' file.

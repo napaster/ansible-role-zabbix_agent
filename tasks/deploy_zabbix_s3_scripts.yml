@@ -1,0 +1,47 @@
+---
+- name: zabbix_agent | Get Zabbix scripts urls from S3
+  local_action:
+    module: "aws_s3"
+    aws_access_key: "{{ vars['zabbix_agent_s3_settings']['aws_access_key'] |
+      default(omit) }}"
+    aws_secret_key: "{{ vars['zabbix_agent_s3_settings']['aws_secret_key'] |
+      default(omit) }}"
+    bucket: "{{ vars['zabbix_agent_s3_settings'].bucket | default(omit) }}"
+    expiration: "{{ vars['zabbix_agent_s3_settings']['expiration'] |
+      default(omit) }}"
+    ignore_nonexistent_bucket: "true"
+    rgw: "{{ vars['zabbix_agent_s3_settings']['rgw'] | default(omit) }}"
+    s3_url: "{{ vars['zabbix_agent_s3_settings']['s3_url'] | default(omit) }}"
+    validate_certs: "{{ vars['zabbix_agent_s3_settings']['validate_certs'] |
+      default(omit) }}"
+    region: "{{ vars['zabbix_agent_s3_settings']['region'] | default(omit) }}"
+    profile: "{{ vars['zabbix_agent_s3_settings']['profile'] | default(omit) }}"
+    mode: "geturl"
+    object: "{{ '/' ~ vars['zabbix_agent_s3_settings']['object_prefix'] ~ '/' ~
+      item['command'] }}"
+  loop: "{{ vars['zabbix_agent_s3_scripts'] | flatten(levels=1) }}"
+  loop_control:
+    label: "{{ item.command }}"
+  register: "zabbix_agent_s3_scripts_src"
+  when:
+  - "item['s3'] is defined"
+  - "item['s3'] == 'true'"
+- name: zabbix_agent | Download Zabbix scripts from S3
+  get_url:
+    url: "{{ item['url'] }}"
+    dest: "{{ vars['zabbix_agent_s3_scripts_dest'] ~ '/' ~ item['item'] |
+      combine | json_query('command') }}"
+    force: "yes"
+    mode: "0755"
+    owner: "{{ hostvars[inventory_hostname]['zabbix_agent_user'] |
+      default(omit) }}"
+    group: "{{ hostvars[inventory_hostname]['zabbix_agent_group'] |
+      default(omit) }}"
+  loop: "{{ vars['zabbix_agent_s3_scripts_src']['results'] |
+    flatten(levels=1) }}"
+  loop_control:
+    label: "{{ item['item'] | combine | json_query('command') }}"
+  when:
+  - "vars['zabbix_agent_s3_scripts_src'] is defined"
+  - "vars['zabbix_agent_s3_scripts_src'] != []"
+  - "item['skipped'] is not defined"

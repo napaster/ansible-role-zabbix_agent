@@ -8,16 +8,37 @@
       json_query('[].settings[]') }}"
     zabbix_agent_psk_string: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
       json_query('[].psk_string[] | [0]') }}"
+    zabbix_agent_s3_settings: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
+      json_query('[].s3_storage_settings[] | [0]') }}"
+    zabbix_agent_s3_scripts: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
+      json_query('[].settings[].user_parameter[]') }}"
 - name: zabbix_agent | Assert that system manager is systemd
   assert:
     that:
     - "hostvars[inventory_hostname]['ansible_service_mgr'] == 'systemd'"
     msg: "System manager is not systemd."
     quiet: "true"
-- name: zabbix_agent | Create zabbix catalog
+- name: zabbix_agent | Create Zabbix catalog
   file:
     path: "{{ hostvars[inventory_hostname]['zabbix_agent_conf_dest'] }}"
     state: "directory"
     owner: "root"
     group: "root"
     mode: "0755"
+- name: zabbix_agent | Create Zabbix S3 scripts catalog
+  file:
+    path: "{{ hostvars[inventory_hostname]['zabbix_agent_s3_scripts_dest'] }}"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  when:
+  - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_install_s3_scripts']) is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_install_s3_scripts']) == 'true'"
+  vars:
+    zabbix_agent_install_s3_scripts: "
+      [] | map(&install_s3_scripts || 'false', @) | [0]"

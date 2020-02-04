@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: "Konstantin Shalygin <k0ste@k0ste.ru>"
-  issue_tracker_url: "http://jira.opentech.local/secure/Dashboard.jspa"
+  issue_tracker_url: "https://jira.e2e4.ru/"
   description: "Deploy Zabbix Monitoring agent"
   company: "LLC Open Technologies"
   license: "GPL"
@@ -12,5 +12,5 @@ galaxy_info:
     - any
   categories:
   - system
-  - networking
+  - monitoring
 dependencies: []
