@@ -2,7 +2,7 @@
 - name: zabbix_agent | Deploy zabbix-agent conf
   template:
     src: "zabbix_agent_psk.j2"
-    dest: "{{ vars['zabbix_agent_conf_dest'] + '/' + 'zabbix_agentd.psk' }}"
+    dest: "{{ vars['zabbix_agent_psk_dest'] + '/' + 'zabbix_agentd.psk' }}"
     group: "root"
     owner: "root"
     mode: "0644"

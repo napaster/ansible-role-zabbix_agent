@@ -25,6 +25,23 @@
     owner: "root"
     group: "root"
     mode: "0755"
+- name: zabbix_agent | Create Zabbix psk catalog
+  file:
+    path: "{{ hostvars[inventory_hostname]['zabbix_agent_psk_dest'] }}"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  when:
+  - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_deploy_psk_file']) is defined"
+  - "hostvars[inventory_hostname]['zabbix_agent'] |
+     json_query(vars['zabbix_agent_deploy_psk_file']) == 'true'"
+  vars:
+    zabbix_agent_deploy_psk_file: "
+      [] | map(&deploy_psk_file || 'false', @) | [0]"
 - name: zabbix_agent | Create Zabbix S3 scripts catalog
   file:
     path: "{{ hostvars[inventory_hostname]['zabbix_agent_s3_scripts_dest'] }}"
