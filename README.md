@@ -198,6 +198,16 @@ zabbix_agent:
       command: 'echo $1'
     - key: 'mysql.ping[*]'
       command: 'mysqladmin -u$1 -p$2 ping | grep -c alive'
+# S3 scripts
+    - key: 'isp.Discovery.Check'
+      command: 'zabbix_router_isp_check_json.sh'
+      s3: 'true'
+# Additional params for this command. The items of list will be joined to
+# command string, quoted ('"') and splitted via space, eg: '123.sh "$1" "$2"'.
+      params:
+      - '$1'
+      - '$2'
+      - '$3'
 #	Full path to location of agent modules.Default depends on compilation options.
 #	To see the default path run command "zabbix_agentd --help".
     load_module_path: '/usr/lib/modules'

@@ -146,7 +146,13 @@
 {% if zu.s3 is defined and zu.s3 == 'true' %}
 {{ 'UserParameter=' ~ zu.key ~ ',' ~
     hostvars[inventory_hostname]['zabbix_agent_s3_scripts_dest'] ~ '/' ~
-    zu.command }}
+    zu.command -}}
+{% if zu.params is defined and zu.params != '' %}
+{% for zup in zu.params %}
+{{ ' \"' ~ zup ~ '\"' -}}
+{% endfor %}
+{% endif %}
+{{ ''}}
 {% else %}
 {{ 'UserParameter=' ~ zu.key ~ ',' ~ zu.command }}
 {% endif %}
