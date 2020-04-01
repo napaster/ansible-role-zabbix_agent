@@ -33,10 +33,8 @@
       combine | json_query('command') }}"
     force: "yes"
     mode: "0755"
-    owner: "{{ hostvars[inventory_hostname]['zabbix_agent_user'] |
-      default(omit) }}"
-    group: "{{ hostvars[inventory_hostname]['zabbix_agent_group'] |
-      default(omit) }}"
+    owner: "root"
+    group: "root"
   loop: "{{ vars['zabbix_agent_s3_scripts_src']['results'] |
     flatten(levels=1) }}"
   loop_control:
