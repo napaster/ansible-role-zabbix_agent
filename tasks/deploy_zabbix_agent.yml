@@ -1,22 +1,22 @@
 ---
 - name: zabbix_agent | Deploy zabbix-agent conf
-  template:
+  ansible.builtin.template:
     src: "zabbix_agent_conf.j2"
-    dest: "{{ vars['zabbix_agent_conf_dest'] + '/' + 'zabbix_agentd.conf' }}"
+    dest: "{{ vars['zabbix_agent_conf_dest'] + '/zabbix_agentd.conf' }}"
     group: "root"
     owner: "root"
     mode: "0644"
     force: "yes"
   notify:
-  - "Restart zabbix-agent"
+    - "Restart zabbix-agent"
 - name: zabbix_agent | Enable zabbix-agent service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ hostvars[inventory_hostname]['zabbix_agent_service'] }}"
     enabled: "yes"
   when:
-  - "hostvars[inventory_hostname]['zabbix_agent'] |
-     json_query(vars['zabbix_agent_enable']) is defined"
-  - "hostvars[inventory_hostname]['zabbix_agent'] |
-     json_query(vars['zabbix_agent_enable']) == 'true'"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_enable']) is defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_enable']) == 'true'"
   vars:
     zabbix_agent_enable: "[] | map(&enable || 'false', @) | [0]"

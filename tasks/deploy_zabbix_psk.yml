@@ -1,14 +1,14 @@
 ---
 - name: zabbix_agent | Deploy zabbix-agent conf
-  template:
+  ansible.builtin.template:
     src: "zabbix_agent_psk.j2"
-    dest: "{{ vars['zabbix_agent_psk_dest'] + '/' + 'zabbix_agentd.psk' }}"
+    dest: "{{ vars['zabbix_agent_psk_dest'] + '/zabbix_agentd.psk' }}"
     group: "root"
     owner: "root"
     mode: "0644"
     force: "yes"
   when:
-  - "vars['zabbix_agent_psk_string'] is defined"
-  - "vars['zabbix_agent_psk_string'] != []"
+    - "vars['zabbix_agent_psk_string'] is defined"
+    - "vars['zabbix_agent_psk_string'] != []"
   notify:
-  - "Restart zabbix-agent"
+    - "Restart zabbix-agent"

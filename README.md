@@ -5,7 +5,7 @@ resources and applications (hard drives, memory, processor statistics etc).
 
 ## Requirements
 
-* Ansible 2.8+;
+* Ansible 3.0.0+;
 
 ## Example configuration
 
@@ -16,8 +16,11 @@ zabbix_agent:
 - enable: 'true'
 # Restart zabbix-agent service or not.
   restart: 'true'
-# Install zabbix-agent package or not.
+# Install/upgrade zabbix-agent package or not
   install_package: 'true'
+# 'present' (do nothing if package is already installed) or 'latest' (always
+# upgrade to last version)
+  package_state: 'latest'
 # Install or not prepared scripts from Amazon S3 storage. This may be useful
 # for uncompatible 'user_parameter' commands with YAML syntax.
   install_s3_scripts: 'true'

@@ -1,38 +1,47 @@
 ---
-- import_tasks: "pre_requisite.yml"
-- include_tasks: "packages.yml"
+- ansible.builtin.import_tasks:
+    file: "pre_requisite.yml"
+- ansible.builtin.include_tasks:
+    file: "packages.yml"
   when:
-  - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
-  - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
-  - "hostvars[inventory_hostname]['zabbix_agent'] |
-     json_query(vars['zabbix_agent_install_package']) is defined"
-  - "hostvars[inventory_hostname]['zabbix_agent'] |
-     json_query(vars['zabbix_agent_install_package']) == 'true'"
+    - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_install_package']) is
+       defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_install_package']) ==
+       'true'"
   vars:
     zabbix_agent_install_package: "
       [] | map(&install_package || 'false', @) | [0]"
-- include_tasks: "deploy_zabbix_psk.yml"
+- ansible.builtin.include_tasks:
+    file: "deploy_zabbix_psk.yml"
   when:
-  - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
-  - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
-  - "hostvars[inventory_hostname]['zabbix_agent'] |
-     json_query(vars['zabbix_agent_deploy_psk']) is defined"
-  - "hostvars[inventory_hostname]['zabbix_agent'] |
-     json_query(vars['zabbix_agent_deploy_psk']) == 'true'"
+    - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_deploy_psk']) is defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_deploy_psk']) == 'true'"
   vars:
-    zabbix_agent_deploy_psk: "[] | map(&install_package || 'false', @) | [0]"
-- include_tasks: "deploy_zabbix_s3_scripts.yml"
+    zabbix_agent_deploy_psk: "[] | map(&deploy_psk_file || 'false', @) | [0]"
+- ansible.builtin.include_tasks:
+    file: "deploy_zabbix_s3_scripts.yml"
   when:
-  - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
-  - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
-  - "hostvars[inventory_hostname]['zabbix_agent'] |
-     json_query(vars['zabbix_agent_install_s3_scripts']) is defined"
-  - "hostvars[inventory_hostname]['zabbix_agent'] |
-     json_query(vars['zabbix_agent_install_s3_scripts']) == 'true'"
+    - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_install_s3_scripts']) is
+       defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_install_s3_scripts']) ==
+       'true'"
   vars:
     zabbix_agent_install_s3_scripts: "
       [] | map(&install_s3_scripts || 'false', @) | [0]"
-- include_tasks: "deploy_zabbix_agent.yml"
+- ansible.builtin.include_tasks:
+    file: "deploy_zabbix_agent.yml"
   when:
-  - "vars['zabbix_agent_settings'] is defined"
-  - "vars['zabbix_agent_settings'] != []"
+    - "vars['zabbix_agent_settings'] is defined"
+    - "vars['zabbix_agent_settings'] != []"
