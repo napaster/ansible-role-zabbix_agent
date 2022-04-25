@@ -16,7 +16,7 @@
 {% if z.debug_level is defined and (z.debug_level > '-1' <= '5') %}
 {{ 'DebugLevel=' ~ z.debug_level }}
 {% endif %}
-{% if z.source_ip is defined and z.source_ip | ipaddr('host') %}
+{% if z.source_ip is defined and z.source_ip | ansible.utils.ipaddr('host') %}
 {{ 'SourceIP=' + z.source_ip }}
 {% endif %}
 {% if z.enable_remote_commands is defined and
@@ -50,14 +50,14 @@
 {{ 'ListenPort=' ~ z.listen_port }}
 {% endif %}
 {% if z.listen_ip is defined and z.listen_ip != '' %}
-{% if z.listen_ip is string and z.listen_ip | ipaddr() %}
+{% if z.listen_ip is string and z.listen_ip | ansible.utils.ipaddr() %}
 {{ 'ListenIP=' + z.listen_ip }}
 {% elif z.listen_ip is sequence %}
 {% for zl in z.listen_ip %}
 {% if loop.first %}
 {{ 'ListenIP=' -}}
 {% endif %}
-{% if zl | ipaddr() %}
+{% if zl | ansible.utils.ipaddr() %}
 {{ zl }}
 {% endif %}
 {% if loop.last %}

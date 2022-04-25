@@ -13,8 +13,8 @@
        community.general.json_query(vars['zabbix_agent_install_package']) ==
        'true'"
   vars:
-    zabbix_agent_install_package: "
-      [] | map(&install_package || 'false', @) | [0]"
+    zabbix_agent_install_package:
+      "[] | map(&install_package || 'false', @) | [0]"
 - ansible.builtin.include_tasks:
     file: "deploy_zabbix_psk.yml"
   when:
@@ -38,8 +38,8 @@
        community.general.json_query(vars['zabbix_agent_install_s3_scripts']) ==
        'true'"
   vars:
-    zabbix_agent_install_s3_scripts: "
-      [] | map(&install_s3_scripts || 'false', @) | [0]"
+    zabbix_agent_install_s3_scripts:
+      "[] | map(&install_s3_scripts || 'false', @) | [0]"
 - ansible.builtin.include_tasks:
     file: "deploy_zabbix_agent.yml"
   when:

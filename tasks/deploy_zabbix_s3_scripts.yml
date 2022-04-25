@@ -23,6 +23,7 @@
   loop_control:
     label: "{{ item.command }}"
   register: "zabbix_agent_s3_scripts_src"
+  become: "no"
   when:
     - "item['s3'] is defined"
     - "item['s3'] == 'true'"

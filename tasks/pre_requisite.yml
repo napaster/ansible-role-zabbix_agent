@@ -53,8 +53,8 @@
        community.general.json_query(vars['zabbix_agent_deploy_psk_file']) ==
        'true'"
   vars:
-    zabbix_agent_deploy_psk_file: "
-      [] | map(&deploy_psk_file || 'false', @) | [0]"
+    zabbix_agent_deploy_psk_file:
+      "[] | map(&deploy_psk_file || 'false', @) | [0]"
 - name: zabbix_agent | Create Zabbix S3 scripts catalog
   ansible.builtin.file:
     path: "{{ hostvars[inventory_hostname]['zabbix_agent_s3_scripts_dest'] }}"
@@ -72,5 +72,5 @@
        community.general.json_query(vars['zabbix_agent_install_s3_scripts']) ==
        'true'"
   vars:
-    zabbix_agent_install_s3_scripts: "
-      [] | map(&install_s3_scripts || 'false', @) | [0]"
+    zabbix_agent_install_s3_scripts:
+      "[] | map(&install_s3_scripts || 'false', @) | [0]"

@@ -1,20 +1,20 @@
 ---
 - name: zabbix_agent | Install the required packages in Redhat derivatives
   block:
-  - name: zabbix_agent | Install the required packages for RedHat via yum
-    ansible.builtin.yum:
-      name: "{{ hostvars[inventory_hostname]['zabbix_agent_package'] }}"
-      state: "{{ vars['zabbix_agent_package_state'] | default(omit) }}"
-      update_cache: "yes"
-    when:
-      - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'yum'"
-  - name: zabbix_agent | Install the required packages for RedHat via dnf
-    ansible.builtin.dnf:
-      name: "{{ hostvars[inventory_hostname]['zabbix_agent_package'] }}"
-      state: "{{ vars['zabbix_agent_package_state'] | default(omit) }}"
-      update_cache: "yes"
-    when:
-      - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'dnf'"
+    - name: zabbix_agent | Install the required packages for RedHat via yum
+      ansible.builtin.yum:
+        name: "{{ hostvars[inventory_hostname]['zabbix_agent_package'] }}"
+        state: "{{ vars['zabbix_agent_package_state'] | default(omit) }}"
+        update_cache: "yes"
+      when:
+        - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'yum'"
+    - name: zabbix_agent | Install the required packages for RedHat via dnf
+      ansible.builtin.dnf:
+        name: "{{ hostvars[inventory_hostname]['zabbix_agent_package'] }}"
+        state: "{{ vars['zabbix_agent_package_state'] | default(omit) }}"
+        update_cache: "yes"
+      when:
+        - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'dnf'"
   when:
     - "hostvars[inventory_hostname]['ansible_os_family'] == 'RedHat'"
 - name: zabbix_agent | Install the required packages in Debian derivatives
