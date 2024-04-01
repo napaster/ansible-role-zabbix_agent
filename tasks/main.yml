@@ -27,20 +27,6 @@
   vars:
     zabbix_agent_deploy_psk: "[] | map(&deploy_psk_file || 'false', @) | [0]"
 - ansible.builtin.include_tasks:
-    file: "deploy_zabbix_s3_scripts.yml"
-  when:
-    - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
-    - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
-    - "hostvars[inventory_hostname]['zabbix_agent'] |
-       community.general.json_query(vars['zabbix_agent_install_s3_scripts']) is
-       defined"
-    - "hostvars[inventory_hostname]['zabbix_agent'] |
-       community.general.json_query(vars['zabbix_agent_install_s3_scripts']) ==
-       'true'"
-  vars:
-    zabbix_agent_install_s3_scripts:
-      "[] | map(&install_s3_scripts || 'false', @) | [0]"
-- ansible.builtin.include_tasks:
     file: "deploy_zabbix_agent.yml"
   when:
     - "vars['zabbix_agent_settings'] is defined"

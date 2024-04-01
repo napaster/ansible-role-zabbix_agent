@@ -16,10 +16,6 @@
       community.general.json_query('[].settings[]') }}"
     zabbix_agent_psk_string: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
       community.general.json_query('[].psk_string[] | [0]') }}"
-    zabbix_agent_s3_settings: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
-      community.general.json_query('[].s3_storage_settings[] | [0]') }}"
-    zabbix_agent_s3_scripts: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
-      community.general.json_query('[].settings[].user_parameter[]') }}"
 - name: zabbix_agent | Assert that zabbix_agent package state in valid value
   ansible.builtin.assert:
     that:
@@ -55,22 +51,3 @@
   vars:
     zabbix_agent_deploy_psk_file:
       "[] | map(&deploy_psk_file || 'false', @) | [0]"
-- name: zabbix_agent | Create Zabbix S3 scripts catalog
-  ansible.builtin.file:
-    path: "{{ hostvars[inventory_hostname]['zabbix_agent_s3_scripts_dest'] }}"
-    state: "directory"
-    owner: "root"
-    group: "root"
-    mode: "0755"
-  when:
-    - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
-    - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
-    - "hostvars[inventory_hostname]['zabbix_agent'] |
-       community.general.json_query(vars['zabbix_agent_install_s3_scripts']) is
-       defined"
-    - "hostvars[inventory_hostname]['zabbix_agent'] |
-       community.general.json_query(vars['zabbix_agent_install_s3_scripts']) ==
-       'true'"
-  vars:
-    zabbix_agent_install_s3_scripts:
-      "[] | map(&install_s3_scripts || 'false', @) | [0]"
