@@ -1,7 +1,7 @@
 ---
 - name: zabbix_agent | Deploy zabbix-agent conf
   ansible.builtin.template:
-    src: "zabbix_agent_conf.j2"
+    src: "zabbix_agent_conf2.j2"
     dest: "{{ vars['zabbix_agent_conf_dest'] + '/zabbix_agent2.conf' }}"
     group: "root"
     owner: "root"
