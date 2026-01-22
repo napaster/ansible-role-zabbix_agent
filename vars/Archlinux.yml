@@ -1,5 +1,6 @@
 ---
-zabbix_agent_service: 'zabbix-agent'
-zabbix_agent_package: 'zabbix-agent'
+zabbix_agent_service: 'zabbix-agent2'
+zabbix_agent_package: 'zabbix-agent2'
+zabbix_agent_plugin: 'zabbix-agent2-plugins-go'
 zabbix_agent_conf_dest: '/etc/zabbix'
 zabbix_agent_psk_dest: '/etc/zabbix'

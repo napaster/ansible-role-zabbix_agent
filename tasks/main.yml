@@ -16,6 +16,27 @@
     zabbix_agent_install_package:
       "[] | map(&install_package || 'false', @) | [0]"
 - ansible.builtin.include_tasks:
+    file: "packages.yml"
+  when:
+    - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_install_plugin']) is
+       defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query(vars['zabbix_agent_install_plugin']) ==
+       'true'"
+  vars:
+    zabbix_agent_install_package:
+      "[] | map(&install_package || 'false', @) | [0]"
+- ansible.builtin.include_tasks:
+    file: "plugin_packages.yml"
+  when:
+    - "hostvars[inventory_hostname]['zabbix_agent'] is defined"
+    - "hostvars[inventory_hostname]['zabbix_agent'] != ''"
+    - "hostvars[inventory_hostname]['zabbix_agent'] |
+       community.general.json_query('[0].install_plugin') == 'true'"
+- ansible.builtin.include_tasks:
     file: "deploy_zabbix_psk.yml"
   when:
     - "hostvars[inventory_hostname]['zabbix_agent'] is defined"

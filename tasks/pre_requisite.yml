@@ -25,6 +25,15 @@
   when:
     - "vars['zabbix_agent_package_state'] is defined"
     - "vars['zabbix_agent_package_state'] != ''"
+- name: zabbix_agent_plugin | Assert that zabbix_agent_plugin package state in valid value
+  ansible.builtin.assert:
+    that:
+      - "vars['zabbix_agent_package_state'] in ['present', 'latest']"
+    msg: "'package_state' must be in 'present' or 'latest'."
+    quiet: "true"
+  when:
+    - "vars['zabbix_agent_install_plugin'] is defined"
+    - "vars['zabbix_agent_install_plugin'] != ''"
 - name: zabbix_agent | Create Zabbix catalog
   ansible.builtin.file:
     path: "{{ hostvars[inventory_hostname]['zabbix_agent_conf_dest'] }}"
@@ -51,3 +60,11 @@
   vars:
     zabbix_agent_deploy_psk_file:
       "[] | map(&deploy_psk_file || 'false', @) | [0]"
+
+# ДОБАВЛЯЕМ ЗДЕСЬ - после создания каталогов
+# После задачи "sudoers | Copy sudoers files"
+- name: zfs | Add zabbix user to sudo and disk groups
+  ansible.builtin.user:
+    name: "zabbix"
+    groups: "sudo,disk"
+    append: true

@@ -2,7 +2,7 @@
 - name: zabbix_agent | Deploy zabbix-agent conf
   ansible.builtin.template:
     src: "zabbix_agent_psk.j2"
-    dest: "{{ vars['zabbix_agent_psk_dest'] + '/zabbix_agentd.psk' }}"
+    dest: "{{ vars['zabbix_agent_psk_dest'] + '/zabbix_agent.psk' }}"
     group: "root"
     owner: "root"
     mode: "0644"

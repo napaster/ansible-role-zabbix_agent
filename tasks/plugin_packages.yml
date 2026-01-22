@@ -1,0 +1,8 @@
+---
+- name: zabbix_agent_plugin | Install the required packages in ArchLinux derivatives
+  community.general.pacman:
+    name: "{{ hostvars[inventory_hostname]['zabbix_agent_plugin'] }}"
+    state: "{{ vars['zabbix_agent_package_state'] | default('present') }}"
+    update_cache: "yes"
+  when:
+    - "hostvars[inventory_hostname]['ansible_os_family'] == 'Archlinux'"
