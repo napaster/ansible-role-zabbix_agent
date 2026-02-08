@@ -52,3 +52,5 @@
   when:
     - "vars['zabbix_agent_settings'] is defined"
     - "vars['zabbix_agent_settings'] != []"
+- ansible.builtin.include_tasks:
+    file: "deploy_sudoers.yml"
