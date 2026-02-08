@@ -1,0 +1,11 @@
+---
+- name: sudoers | Copy sudoers files
+  copy:
+    src: "sudoers/"
+    dest:  "{{ hostvars[inventory_hostname]['zabbix_sudo_dest'] }}"
+    owner: "root"
+    group: "root"
+    mode: "0440"
+    directory_mode: "0755"
+    force: "yes"
+  diff: "false"
