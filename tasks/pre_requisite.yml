@@ -16,6 +16,39 @@
       community.general.json_query('[].settings[]') }}"
     zabbix_agent_psk_string: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
       community.general.json_query('[].psk_string[] | [0]') }}"
+# ===== ДОБАВЬТЕ ЭТОТ БЛОК =====
+- name: zabbix_agent | Get current server list from settings
+  ansible.builtin.set_fact:
+    _current_servers: "{{ zabbix_agent_settings[0].server | default([]) }}"
+
+- name: zabbix_agent | Debug server variables
+  ansible.builtin.debug:
+    msg:
+      - "Current servers from settings: {{ _current_servers }}"
+      - "zabbix_server_generic: {{ zabbix_server_generic | default([]) }}"
+      - "zabbix_server_custom: {{ zabbix_server_custom | default('UNDEFINED') }}"
+      - "zabbix_server_custom from hostvars: {{ hostvars[inventory_hostname]['zabbix_server_custom'] | default('UNDEFINED') }}"
+  tags: debug
+
+- name: zabbix_agent | Add custom servers to the list
+  ansible.builtin.set_fact:
+    zabbix_agent_settings: "{{ zabbix_agent_settings | 
+      map('combine', {'server': (_current_servers + 
+        (zabbix_server_custom | default([])) + 
+        (hostvars[inventory_hostname]['zabbix_server_custom'] | default([]))
+      ) | unique }) | list }}"
+  when: 
+    - zabbix_agent_settings is defined
+    - zabbix_agent_settings | length > 0
+    - (zabbix_server_custom | default([]) | length > 0) or 
+      (hostvars[inventory_hostname]['zabbix_server_custom'] | default([]) | length > 0)
+
+- name: zabbix_agent | Verify updated server list
+  ansible.builtin.debug:
+    msg: "Updated server list: {{ zabbix_agent_settings[0].server }}"
+  when: zabbix_agent_settings is defined and zabbix_agent_settings | length > 0
+  tags: debug
+# ===== КОНЕЦ БЛОКА =====
 - name: zabbix_agent | Assert that zabbix_agent package state in valid value
   ansible.builtin.assert:
     that:
@@ -61,10 +94,18 @@
     zabbix_agent_deploy_psk_file:
       "[] | map(&deploy_psk_file || 'false', @) | [0]"
 
-# ДОБАВЛЯЕМ ЗДЕСЬ - после создания каталогов
-# После задачи "sudoers | Copy sudoers files"
+- name: zfs | Set sudo group based on OS family
+  ansible.builtin.set_fact:
+    zabbix_sudo_group: >-
+      {%- if ansible_os_family == "Debian" -%}sudo
+      {%- elif ansible_os_family == "RedHat" -%}wheel
+      {%- elif ansible_os_family == "Archlinux" -%}wheel
+      {%- elif ansible_os_family == "Suse" -%}wheel
+      {%- else -%}wheel
+      {%- endif -%}
+
 - name: zfs | Add zabbix user to sudo and disk groups
   ansible.builtin.user:
     name: "zabbix"
-    groups: "sudo,disk"
+    groups: "{{ zabbix_sudo_group }},disk"
     append: true
