@@ -48,7 +48,6 @@
     msg: "Updated server list: {{ zabbix_agent_settings[0].server }}"
   when: zabbix_agent_settings is defined and zabbix_agent_settings | length > 0
   tags: debug
-# ===== КОНЕЦ БЛОКА =====
 - name: zabbix_agent | Assert that zabbix_agent package state in valid value
   ansible.builtin.assert:
     that:
@@ -93,7 +92,6 @@
   vars:
     zabbix_agent_deploy_psk_file:
       "[] | map(&deploy_psk_file || 'false', @) | [0]"
-
 - name: zfs | Set sudo group based on OS family
   ansible.builtin.set_fact:
     zabbix_sudo_group: >-
@@ -103,7 +101,6 @@
       {%- elif ansible_os_family == "Suse" -%}wheel
       {%- else -%}wheel
       {%- endif -%}
-
 - name: zfs | Add zabbix user to sudo and disk groups
   ansible.builtin.user:
     name: "zabbix"

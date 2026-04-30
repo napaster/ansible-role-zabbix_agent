@@ -1,0 +1,17 @@
+---
+- name:  "smartctl | Copy smartctl wrapper script"
+  ansible.builtin.copy:
+    src: "{{ file['src'] }}"
+    dest:  "{{ hostvars[inventory_hostname]['zabbix_smart_dest'] }}"
+    mode: "0755"
+    owner: "root"
+    group: "root"
+    force: "yes"
+  loop:
+    - {src: 'smartctlwrapper',
+       dest: '/usr/sbin/smartctlwrapper'}
+  loop_control:
+    loop_var: "file"
+    label: "{{ file['src'] }}"
+  when:
+    - zabbix_agent_smartctl_enabled | default(false) | bool

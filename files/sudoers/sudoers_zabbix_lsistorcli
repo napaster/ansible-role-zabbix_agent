@@ -1,0 +1,3 @@
+Cmnd_Alias LSISTORCLI=/opt/MegaRAID/storcli/storcli64,/etc/zabbix/scripts/lsistorcli_ctlinfo.sh,/etc/zabbix/scripts/lsistorcli_cvsinfo.sh,/etc/zabbix/scripts/lsistorcli_ldinfo.sh,/etc/zabbix/scripts/lsistorcli_pdinfo.sh,/etc/zabbix/scripts/lsistorcli_pdinfo_ne.sh,/etc/zabbix/scripts/lsistorcli_pdinfo_all.sh,/etc/zabbix/scripts/lsistorcli_bbuinfo.sh
+zabbix ALL= (root) NOPASSWD: LSISTORCLI
+Defaults!LSISTORCLI !logfile, !syslog, !pam_session
