@@ -1,0 +1,40 @@
+# tasks/deploy_zfs.yml
+---
+- name: "zfs | Create ZFS include directory"
+  ansible.builtin.file:
+    path: "/etc/zabbix/zfs"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - zabbix_agent_zfs_enabled | default(false) | bool
+- name: "zfs | Copy ZFS user parameter files"
+  ansible.builtin.copy:
+    src: "zfs/{{ item }}"
+    dest: "/etc/zabbix/zfs/{{ item }}"
+    mode: "0644"
+    owner: "root"
+    group: "root"
+    force: "yes"
+  loop:
+    - "userparams_zol_with_sudo.conf"
+  when:
+    - zabbix_agent_zfs_enabled | default(false) | bool
+  notify:
+    - "Restart zabbix-agent"
+
+- name: "zfs | Get current include paths"
+  ansible.builtin.set_fact:
+    _current_includes: "{{ zabbix_agent_settings[0].include | default([]) }}"
+  when:
+    - zabbix_agent_zfs_enabled | default(false) | bool
+    - zabbix_agent_settings is defined
+    - zabbix_agent_settings | length > 0
+- name: "zfs | Add ZFS include path to settings (preserve other settings)"
+  ansible.builtin.set_fact:
+    zabbix_agent_settings: "{{ zabbix_agent_settings | map('combine', {'include': _current_includes + ['/etc/zabbix/zfs/*.conf']}) | list }}"
+  when:
+    - zabbix_agent_zfs_enabled | default(false) | bool
+    - zabbix_agent_settings is defined
+    - zabbix_agent_settings | length > 0

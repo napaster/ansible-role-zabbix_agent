@@ -1,11 +1,32 @@
 ---
-- name: sudoers | Copy sudoers files
-  copy:
-    src: "sudoers/"
+- name:  "sudoers | Copy sudoers files"
+  ansible.builtin.copy:
+    src: "{{ file['src'] }}"
     dest:  "{{ hostvars[inventory_hostname]['zabbix_sudo_dest'] }}"
+    mode: "0644"
     owner: "root"
     group: "root"
-    mode: "0440"
-    directory_mode: "0755"
     force: "yes"
-  diff: "false"
+  loop:
+    - {src: 'sudoers/zabbix',
+       dest: '/etc/sudoers.d/zabbix'}
+  loop_control:
+    loop_var: "file"
+    label: "{{ file['src'] }}"
+- name:  "sudoers | Copy sudoers LSI files"
+  ansible.builtin.copy:
+    src: "{{ file['src'] }}"
+    dest:  "{{ hostvars[inventory_hostname]['zabbix_sudo_dest'] }}"
+    mode: "0644"
+    owner: "root"
+    group: "root"
+    force: "yes"
+  loop:
+    - {src: 'sudoers/sudoers_zabbix_lsistorcli',
+       dest: '/etc/sudoers.d/sudoers_zabbix_lsistorcli'}
+  loop_control:
+    loop_var: "file"
+    label: "{{ file['src'] }}"
+  when:
+    - zabbix_agent_user_parameter_lsiraid is defined
+    - zabbix_agent_user_parameter_lsiraid | length > 0

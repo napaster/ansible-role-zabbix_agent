@@ -1,0 +1,45 @@
+# tasks/deploy_lsiraid.yml
+---
+- name: "lsiraid | Create scripts directory"
+  ansible.builtin.file:
+    path: "/etc/zabbix/scripts"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - zabbix_agent_user_parameter_lsiraid is defined
+    - zabbix_agent_user_parameter_lsiraid | length > 0
+    - zabbix_agent_lsiraid_enabled | default(false) | bool
+- name: "lsiraid | Copy LSI RAID scripts"
+  ansible.builtin.copy:
+    src: "{{ file.src }}"
+    dest: "{{ file.dest }}"
+    mode: "0755"
+    owner: "root"
+    group: "root"
+    force: "yes"
+  loop:
+    - {src: 'lsi/lsistorcli_bbuinfo.sh', dest: '/etc/zabbix/scripts/lsistorcli_bbuinfo.sh'}
+    - {src: 'lsi/lsistorcli_ctlinfo.sh', dest: '/etc/zabbix/scripts/lsistorcli_ctlinfo.sh'}
+    - {src: 'lsi/lsistorcli_cvsinfo.sh', dest: '/etc/zabbix/scripts/lsistorcli_cvsinfo.sh'}
+    - {src: 'lsi/lsistorcli_ldinfo.sh', dest: '/etc/zabbix/scripts/lsistorcli_ldinfo.sh'}
+    - {src: 'lsi/lsistorcli_pdinfo.sh', dest: '/etc/zabbix/scripts/lsistorcli_pdinfo.sh'}
+    - {src: 'lsi/lsistorcli_pdinfo_all.sh', dest: '/etc/zabbix/scripts/lsistorcli_pdinfo_all.sh'}
+    - {src: 'lsi/lsistorcli_pdinfo_ne.sh', dest: '/etc/zabbix/scripts/lsistorcli_pdinfo_ne.sh'}
+  loop_control:
+    loop_var: "file"
+    label: "{{ file.src }}"
+  when:
+    - zabbix_agent_user_parameter_lsiraid is defined
+    - zabbix_agent_user_parameter_lsiraid | length > 0
+  notify:
+    - "Restart zabbix-agent"
+
+- name: "lsiraid | Add LSI RAID user parameters to custom list"
+  ansible.builtin.set_fact:
+    zabbix_agent_user_parameter_custom: "{{ zabbix_agent_user_parameter_custom | default([]) + zabbix_agent_user_parameter_lsiraid }}"
+  when:
+    - zabbix_agent_user_parameter_lsiraid is defined
+    - zabbix_agent_user_parameter_lsiraid | length > 0
+    - zabbix_agent_lsiraid_enabled | default(false) | bool

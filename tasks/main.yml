@@ -37,6 +37,19 @@
     - "hostvars[inventory_hostname]['zabbix_agent'] |
        community.general.json_query('[0].install_plugin') == 'true'"
 - ansible.builtin.include_tasks:
+    file: deploy_smartctl.yml
+  when:
+    - zabbix_agent_smartctl_enabled | default(false) | bool
+- ansible.builtin.include_tasks:
+    file: deploy_zfs.yml
+  when:
+    - zabbix_agent_zfs_enabled | default(false) | bool
+- name: Include tasks for LSI RAID deployment
+  ansible.builtin.include_tasks: deploy_lsiraid.yml
+  when:
+    - zabbix_agent_user_parameter_lsiraid is defined
+    - zabbix_agent_user_parameter_lsiraid | length > 0
+- ansible.builtin.include_tasks:
     file: "deploy_zabbix_psk.yml"
   when:
     - "hostvars[inventory_hostname]['zabbix_agent'] is defined"

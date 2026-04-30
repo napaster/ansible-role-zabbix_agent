@@ -1,8 +1,27 @@
+# tasks/plugin_packages.yml
 ---
-- name: zabbix_agent_plugin | Install the required packages in ArchLinux derivatives
-  community.general.pacman:
-    name: "{{ hostvars[inventory_hostname]['zabbix_agent_plugin'] }}"
-    state: "{{ vars['zabbix_agent_package_state'] | default('present') }}"
-    update_cache: "yes"
+- name: zabbix_agent_plugin | Assert that zabbix_agent_plugin package state in valid value
+  ansible.builtin.assert:
+    that:
+      - "zabbix_agent_package_state in ['present', 'latest']"
+    msg: "'package_state' must be in 'present' or 'latest'."
+    quiet: true
   when:
-    - "hostvars[inventory_hostname]['ansible_os_family'] == 'Archlinux'"
+    - "zabbix_agent_install_plugin is defined"
+    - "zabbix_agent_install_plugin | bool"
+
+- name: zabbix_agent_plugin | Install zabbix-agent2 plugin packages
+  ansible.builtin.package:
+    name: "{{ zabbix_agent_plugin }}"
+    state: "{{ zabbix_agent_package_state }}"
+  when:
+    - "zabbix_agent_install_plugin is defined"
+    - "zabbix_agent_install_plugin | bool"
+  notify: restart zabbix-agent
+
+# Добавляем деплой кастомных плагинов (скрипты, обертки и т.д.)
+- name: zabbix_agent_plugin | Deploy custom plugins and scripts
+  ansible.builtin.include_tasks: deploy_plugins.yml
+  when:
+    - "zabbix_agent_install_plugin is defined"
+    - "zabbix_agent_install_plugin | bool"
