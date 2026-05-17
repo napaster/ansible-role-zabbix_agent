@@ -141,6 +141,24 @@
       z.unsafe_user_parameters in ['0', '1'] %}
 {{ 'UnsafeUserParameters=' ~ z.unsafe_user_parameters }}
 {% endif %}
+{% if z.allow_key is defined and z.allow_key != '' %}
+{% if z.allow_key is string %}
+{{ 'AllowKey=' + z.allow_key }}
+{% elif z.allow_key is sequence %}
+{% for za in z.allow_key %}
+{{ 'AllowKey=' + za }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if z.deny_key is defined and z.deny_key != '' %}
+{% if z.deny_key is string %}
+{{ 'DenyKey=' + z.deny_key }}
+{% elif z.deny_key is sequence %}
+{% for zd in z.deny_key %}
+{{ 'DenyKey=' + zd }}
+{% endfor %}
+{% endif %}
+{% endif %}
 {% if z.user_parameter is defined and z.user_parameter != '' %}
 {% for zu in z.user_parameter %}
 {% if zu.s3 is defined and zu.s3 == 'true' %}
@@ -158,8 +176,9 @@
 {% endif %}
 {% endfor %}
 {% endif %}
-{% if z.plugin_paremetr is defined and z.plugin_paremetr %}
-{% for zp in z.plugin_paremetr %}
+{% set plugin_parameters = z.plugin_parameter | default([]) %}
+{% if plugin_parameters %}
+{% for zp in plugin_parameters %}
 {{ zp.key ~ '=' ~ zp.command }}
 {% endfor %}
 {% endif %}

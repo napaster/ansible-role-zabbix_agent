@@ -5,7 +5,7 @@
       - "hostvars[inventory_hostname]['ansible_service_mgr'] == 'systemd'"
     msg: "System manager is not systemd."
     quiet: "true"
-- name: zabbix_agent | Add the OS specific varibles
+- name: zabbix_agent | Add the OS specific variables
   ansible.builtin.include_vars:
     file: "{{ hostvars[inventory_hostname]['ansible_os_family'] + '.yml' }}"
 - name: zabbix_agent | Set facts about zabbix_agent role
@@ -16,38 +16,6 @@
       community.general.json_query('[].settings[]') }}"
     zabbix_agent_psk_string: "{{ hostvars[inventory_hostname]['zabbix_agent'] |
       community.general.json_query('[].psk_string[] | [0]') }}"
-# ===== ДОБАВЬТЕ ЭТОТ БЛОК =====
-- name: zabbix_agent | Get current server list from settings
-  ansible.builtin.set_fact:
-    _current_servers: "{{ zabbix_agent_settings[0].server | default([]) }}"
-
-- name: zabbix_agent | Debug server variables
-  ansible.builtin.debug:
-    msg:
-      - "Current servers from settings: {{ _current_servers }}"
-      - "zabbix_server_generic: {{ zabbix_server_generic | default([]) }}"
-      - "zabbix_server_custom: {{ zabbix_server_custom | default('UNDEFINED') }}"
-      - "zabbix_server_custom from hostvars: {{ hostvars[inventory_hostname]['zabbix_server_custom'] | default('UNDEFINED') }}"
-  tags: debug
-
-- name: zabbix_agent | Add custom servers to the list
-  ansible.builtin.set_fact:
-    zabbix_agent_settings: "{{ zabbix_agent_settings | 
-      map('combine', {'server': (_current_servers + 
-        (zabbix_server_custom | default([])) + 
-        (hostvars[inventory_hostname]['zabbix_server_custom'] | default([]))
-      ) | unique }) | list }}"
-  when: 
-    - zabbix_agent_settings is defined
-    - zabbix_agent_settings | length > 0
-    - (zabbix_server_custom | default([]) | length > 0) or 
-      (hostvars[inventory_hostname]['zabbix_server_custom'] | default([]) | length > 0)
-
-- name: zabbix_agent | Verify updated server list
-  ansible.builtin.debug:
-    msg: "Updated server list: {{ zabbix_agent_settings[0].server }}"
-  when: zabbix_agent_settings is defined and zabbix_agent_settings | length > 0
-  tags: debug
 - name: zabbix_agent | Assert that zabbix_agent package state in valid value
   ansible.builtin.assert:
     that:
